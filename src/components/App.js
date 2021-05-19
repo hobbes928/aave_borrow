@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-//import { connect } from 'react-redux'
 import { borrow } from './interactions'
 import './App.css';
-import Web3 from 'web3'
 
 
 
@@ -48,6 +46,7 @@ class App extends Component {
           </div>
         </div>
         <h2>Eth Balance: </h2>
+        <h2>Dai Balance: </h2>
         <button type="submit" className="btn btn-primary btn-sm" onClick={(e) => borrow(this.props.dispatch)}>Borrow</button>
         
             
@@ -60,9 +59,6 @@ class App extends Component {
   }
 }
 
-function mapStateToProps(state) {
-  return {
-  }
-}
+
 
 export default App;

@@ -1,42 +1,51 @@
 // SPDX-License-Identifier: agpl-3.0
 pragma solidity ^0.6.12;
 
-import {LendingPoolAddressesProvider} from '@aave/protocol-v2/contracts/protocol/configuration/LendingPoolAddressesProvider.sol';
-import {LendingPool, IERC20} from '@aave/protocol-v2/contracts/protocol/lendingpool/LendingPool.sol';
-
-//import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-
+//import protocol-v2 interface contracts to interact with AAVE contracts
+//import IERC20 to approve for deposit
+import "@aave/protocol-v2/contracts/interfaces/ILendingPoolAddressesProvider.sol";
+import "@aave/protocol-v2/contracts/interfaces/ILendingPool.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract EthtoDai {
 
-    LendingPoolAddressesProvider provider;
-    address _wEthAddress = 0xcc9a0B7c43DC2a5F023Bb9b738E45B0Ef6B06E04;
-    uint16 _referralCode = 0;
-    address _daiAddress = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
-    uint256 _variableRate = 1;
+    //Variables
+    ILendingPoolAddressesProvider provider;
+    address _wEthAddress = address(0xcc9a0B7c43DC2a5F023Bb9b738E45B0Ef6B06E04); // wETH Gateway address: https://docs.aave.com/developers/v/2.0/deployed-contracts/deployed-contracts
+    address _daiAddress = address(0x778A13D3eeb110A4f7bb6529F99c000119a08E92); // DAI stable debt address:https://docs.aave.com/developers/v/2.0/deployed-contracts/deployed-contracts
+    uint16 _referralCode = 0; // use zero for no referral
+    uint256 _stableRate = 1; // use 1 for stable rate borrow
+    
+    //Events
+    event Main(address _from, uint256 _ethAmount, uint256 _daiamount);
+    
+    constructor () public {
+        provider = ILendingPoolAddressesProvider(address(0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5)); //// mainnet address, for other addresses: https://docs.aave.com/developers/developing-on-aave/deployed-contract-instances
+        
+    }
 
 
-function main(uint256 _eth, uint256 _dai) public returns (bool) {
-//require(msg.sender != address(0));
-provider = LendingPoolAddressesProvider(address(0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5));
-LendingPool lendingPool = LendingPool(provider.getLendingPool());
+function main(uint256 _deposit, uint256 _borrow) external returns(bool) { 
+//Retrieve the lending pool contract address from LendingPoolAdressProvider
+ILendingPool lendingPool = ILendingPool(provider.getLendingPool());
 
-//Approve LendingPool contract to move your Eth
-IERC20(_wEthAddress).approve(provider.getLendingPool(), _eth);
+//Approve wETH contract to move your Eth
+IERC20(_wEthAddress).approve(provider.getLendingPool(), _deposit);
 
 //Deposit Eth
-lendingPool.deposit(_wEthAddress, _eth, msg.sender, _referralCode);
-
+// _deposit: is the deposit emount in wei
+// msg.sender: eth will be deposited from this account
+lendingPool.deposit(_wEthAddress, _deposit, msg.sender, _referralCode);
 
 //Borrow Dai
-lendingPool.borrow(_daiAddress, _dai, _variableRate, _referralCode, msg.sender);
+// _borrow: is the amount being borrowed
+// msg.sender: is the address that the borrowed funds will go to
+lendingPool.borrow(_daiAddress, _borrow, _stableRate, _referralCode, msg.sender);
 
-
-return (true);
-
+emit Main(msg.sender, _deposit, _borrow);
+return true;
 
 }
-
 
 
 }

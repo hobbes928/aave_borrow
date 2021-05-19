@@ -5,14 +5,13 @@ import Web3 from 'web3'
 export const borrow = async (dispatch) => {
     try{
         const web3 = new Web3(Web3.givenProvider || 'http://localhost:7545')
-        const network = await web3.eth.net.getNetworkType()
         const networkID = await web3.eth.net.getId()
         await window.ethereum.enable()
 
         const accounts = await web3.eth.getAccounts()
         const ethtodai = new web3.eth.Contract(EthtoDai.abi, EthtoDai.networks[networkID].address)
-        var ethdeposit = await web3.eth.getBalance(accounts[0])
-        var daiborrow =  10000
+        const ethdeposit = await web3.eth.getBalance(accounts[0])
+        const daiborrow = 10
         const amount = web3.utils.fromWei(ethdeposit, 'ether')
         
         console.log(ethtodai)

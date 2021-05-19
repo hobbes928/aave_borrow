@@ -15,8 +15,8 @@ module.exports = {
     solc: {
       version: "0.6.12+commit.27d51765",
       optimizer: {
-        enabled: true,
-        runs: 1500
+        enabled: false,
+        runs: 200
       }
     }
   }
